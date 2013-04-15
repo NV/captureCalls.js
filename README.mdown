@@ -1,0 +1,19 @@
+# captureCalls.js
+
+[Demo](http://www.youtube.com/watch?v=jm31znLczrU)
+
+## Usage
+
+```javascript
+captureCalls(document, 'getElementById')
+captureCalls('document.getElementById') // the same as the previous
+document.getElementById.revertToOriginal()
+```
+
+## Options
+
+**captureCalls.logFileNames**  
+`true`: show URLs with line numbers, e.g. `http://nv.github.io/captureCalls.js/demo/demo.js:7`
+
+**captureCalls.logDetails**  
+`false`: show an object with details, e.g. `{this: window, function: function() {[native]}}`

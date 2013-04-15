@@ -1,0 +1,14 @@
+html {
+	background: #111;
+	text-align: center;
+	font-family: Futura, 'Gill Sans', 'Trebuchet MS', sans-serif;
+	color: white;
+}
+h1 {
+	margin: 1em 0;
+}
+.ribbon {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
