@@ -18,14 +18,20 @@
 		object[methodName] = function patched(/* args */) {
 			var result = originalMethod.apply(this, arguments);
 			var out = placeArgs(originalMethod, arguments);
-			out[0] = (path || methodName) + out[0] + ' -> %o';
+			out[0] = '%c' + (path || methodName) + out[0] + ' -> %o';
+			out.splice(1, 0, 'color: hsl(146, 84%, 35%)');
 			out.push(result);
+
 			if (captureCalls.logDetails) {
 				out.push(new details(originalMethod, this));
 			}
-			logList(out);
-			logStack(patched);
-			log('');
+
+			if (captureCalls.stacktraces) {
+				out.push('\n' + getStacktrace());
+			}
+
+			console.info.apply(console, out);
+
 			return result;
 		};
 
@@ -38,15 +44,9 @@
 		};
 	};
 
+	captureCalls.stacktraces = true;
 	captureCalls.logFileNames = true;
 	captureCalls.logDetails = false;
-
-
-	// Don't show URL for the message
-	var log = new Function('message', 'console.log(message)');
-	var logList = new Function('result', 'result[0] = "%c" + result[0];\n'
-		+ 'result.splice(1, 0, "color: hsl(146, 84%, 35%)");\n'
-		+ 'console.log.apply(console, result);');
 
 
 	/**
@@ -67,66 +67,34 @@
 
 
 	/**
-	 * @param {Function} constructor
+	 * @returns {string}
 	 */
-	function logStack(constructor) {
-		var callSites = generateCallSites(constructor);
-		logCallSites(callSites);
-	}
-
-
-	var _Error_prepareStackTrace = Error.prepareStackTrace;
-
-	/**
-	 * @see https://code.google.com/p/v8/wiki/JavaScriptStackTraceApi
-	 * @param {Function} constructor
-	 * @return Array.<CallSite>
-	 */
-	function generateCallSites(constructor) {
-		Error.prepareStackTrace = function(error, stack) {
-			return stack;
-		};
-		var error = new Error();
-		Error.captureStackTrace(error, constructor);
-		Error.prepareStackTrace = _Error_prepareStackTrace;
-		return error.stack;
-	}
-
-
-	/**
-	 * @param {Array.<CallSite>} stack
-	 */
-	function logCallSites(stack) {
-		var length = stack.length;
-		for (var i = 0; i < length; i++) {
-			var item = stack[i];
-			var functionName = item.getFunctionName() || '';
-			if (i == length - 1 && item.isToplevel() && !functionName) {
-				continue; // don't print the whole JS file
-			}
-			var func = item.getFunction() || '';
-			var result = [''];
-			if (item.isEval()) {
-				result = ['eval(%s)', JSON.stringify(stripFunction(func.toString()))];
-			} else {
-				if (func && func.arguments) {
-					result = placeArgs(func, func.arguments);
-				}
-				if (functionName) {
-					result[0] = functionName + result[0];
-				}
-				if (item.isConstructor()) {
-					result[0] = 'new ' + result[0];
-				}
-				if (captureCalls.logFileNames) {
-					addFileNames(result, item);
-				}
-				if (captureCalls.logDetails) {
-					result.push(new details(func, item.getThis()));
-				}
-			}
-			logList(result);
+	function getStacktrace() {
+		var stack;
+		try {
+			I_am_certain_this_variable_is_undefined++;
+		} catch (e) {
+			stack = e.stack || e.stacktrace || '';
 		}
+		return chopOffLines(stack, 3);
+	}
+
+
+	/**
+	 * @param {string} string
+	 * @param {number} n
+	 * @returns {string}
+	 */
+	function chopOffLines(string, n) {
+		var index = 0;
+		while (n--) {
+			var newIndex = string.indexOf('\n', index);
+			if (newIndex === -1) {
+				break;
+			}
+			index = newIndex + 1;
+		}
+		return string.slice(index);
 	}
 
 
@@ -138,19 +106,6 @@
 	function details(fn, scope) {
 		this['function'] = fn;
 		this['this'] = scope;
-	}
-
-
-	/**
-	 * @param {Array} result
-	 * @param {CallSite.<string>} item
-	 */
-	function addFileNames(result, item) {
-		result[0] += ' %s'; // https://code.google.com/p/chromium/issues/detail?id=231074
-		result.push(
-		item.getFileName() + ':' +
-		(item.getLineNumber() - 1) // https://code.google.com/p/chromium/issues/detail?id=231077
-		);
 	}
 
 
@@ -185,15 +140,6 @@
 		}
 		args.unshift('(' + buffer.join('') + ')');
 		return args;
-	}
-
-
-	/**
-	 * @param {string} fn
-	 * @return {string}
-	 */
-	function stripFunction(fn) {
-		return fn.replace(/^\s*function\s+/, '')
 	}
 
 })();

@@ -1,9 +1,3 @@
-if (!Error.captureStackTrace) {
-	console.warn('stopBefore uses V8 stack traces API to get arguments\' values. Your browser does not support it.');
-	console.warn('https://code.google.com/p/v8/wiki/JavaScriptStackTraceApi');
-}
-
-
 function a(x) {
 	return b(x * 2);
 }

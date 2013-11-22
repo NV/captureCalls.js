@@ -12,6 +12,9 @@ document.getElementById.revertToOriginal()
 
 ## Options
 
+**captureCalls.stacktrace**  
+`true`: include stack traces in the output
+
 **captureCalls.logFileNames**  
 `true`: show URLs with line numbers, e.g. `http://nv.github.io/captureCalls.js/demo/demo.js:7`
 
