@@ -1,0 +1,28 @@
+{
+	"manifest_version": 2,
+	"name": "captureCalls",
+	"short_name": "capturecalls",
+
+	"version": "1.0.0",
+
+	"description": "Logs function calls in DevTools console.",
+	"icons": {
+		"32": "icon_32.png",
+		"64": "icon_64.png",
+		"128": "icon_128.png"
+	},
+	"homepage_url": "http://nv.github.io/captureCalls.js/",
+	"author": "Nikita Vasilyev",
+
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["captureCalls_content_script.js"],
+			"run_at": "document_start"
+		}
+	],
+
+	"web_accessible_resources": [
+		"captureCalls.js"
+	]
+}

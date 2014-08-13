@@ -1,14 +1,25 @@
 # captureCalls.js
 
-[Demo](http://www.youtube.com/watch?v=jm31znLczrU)
+[Demo](http://nv.github.io/captureCalls.js/)
+
 
 ## Usage
 
-```javascript
-captureCalls(document, 'getElementById')
-captureCalls('document.getElementById') // the same as the previous
-document.getElementById.revertToOriginal()
-```
+There are two ways to use captureCalls.js: a Chrome extension or a standalone script.
+
+### [Chrome extension](https://chrome.google.com/webstore/detail/capturecalls/jbifbiilihmmfjcbfbbdhknaehdgbabd)
+
+Once installed, it runs on all web sites and defines `captureCalls` function globally,
+so it can be used not only in DevTools console but in all JavaScripts as well.
+
+### Standalone script
+
+Download [captureCalls.js](https://raw.githubusercontent.com/NV/captureCalls.js/gh-pages/chrome/captureCalls.js)
+and include it into your web page `<script src="captureCalls.js"></script>`.
+
+It’s generally a good idea to include captureCalls.js only for a developer environment
+ and keep it out of production.
+
 
 ## Options
 
@@ -20,3 +31,8 @@ document.getElementById.revertToOriginal()
 
 **captureCalls.logDetails**  
 `false`: show an object with details, e.g. `{this: window, function: function() {[native]}}`
+
+
+## TODO
+
+ - Write on how captureCalls is superior to Chrome DevTools `monitor` function.

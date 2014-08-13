@@ -7,11 +7,29 @@
 	window.captureCalls = function captureCalls(object, methodName) {
 
 		var path = '';
+		var fn = null;
 		if (typeof methodName == 'undefined') {
-			path = object;
-			var temp = resolvePath(object);
-			object = temp.object;
-			methodName = temp.methodName;
+			if (typeof object === 'function') {
+				fn = object;
+				if (!fn.name) {
+					console.error('captureCalls(fn) doesn\'t work when fn is an anonymous function.');
+					return null;
+				}
+				if (window[fn.name] !== fn) {
+					console.error('captureCalls(fn) signature only works when fn is a global function.');
+					return null;
+				}
+				path = methodName = fn.name;
+				object = window;
+			} else if (typeof object === 'string') {
+				path = object;
+				var temp = resolvePath(path);
+				object = temp.object;
+				methodName = temp.methodName;
+			} else {
+				console.error('captureCalls(fn): fn must be either a function or a string, instead got:', object);
+				return null;
+			}
 		}
 
 		var originalMethod = object[methodName];
